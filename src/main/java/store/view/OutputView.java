@@ -18,11 +18,12 @@ public class OutputView {
         products.getProducts().forEach(System.out::println);
     }
 
-    public static void printResults(Orders orders) {
+    public static void printResults(Orders orders, String membership) {
         printNewLine();
         System.out.println("===========W 편의점=============");
         printOrders(orders);
         printAdded(orders);
+        printPayment(orders, membership);
     }
 
     public static void printErrorMessage(String message) {
@@ -43,6 +44,14 @@ public class OutputView {
         orders.getOrders()
                 .stream().filter(order -> orders.getAddedProductCount(order) > 0)
                 .forEach(order -> System.out.println(order.getName() + "\t\t" + orders.getAddedProductCount(order)));
+    }
+
+    private static void printPayment(Orders orders, String membership) {
+        System.out.println("==============================");
+        System.out.println("총구매액\t\t" + orders.getTotalCount() + "\t" + orders.getTotalPrice());
+        System.out.println("행사할인\t\t\t\t\t-" + orders.getPromotionDiscount());
+        System.out.println("멤버십할인\t\t\t\t\t-" + orders.getMembership(membership));
+        System.out.println("내실돈\t\t\t\t\t" + orders.getPayment(membership));
     }
 
     private static void printNewLine() {

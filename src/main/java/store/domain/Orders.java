@@ -1,5 +1,7 @@
 package store.domain;
 
+import camp.nextstep.edu.missionutils.DateTimes;
+import java.time.LocalDate;
 import java.util.List;
 
 public class Orders {
@@ -24,10 +26,10 @@ public class Orders {
 
     public int getAddedProductCount(Order order) {
         Product product = products.getPromotionalProductByName(order.getName());
-        if (product != null)
-            return order.getQuantity() / (product.getPromotion().getBuy() + product.getPromotion().getGet());
+        if (product == null) return 0;
 
-        return 0;
+        if (product.getQuantity() > order.getQuantity()) return order.getQuantity() / (product.getPromotion().getBuy() + product.getPromotion().getGet());
+        return product.getQuantity() / (product.getPromotion().getBuy() + product.getPromotion().getGet());
     }
 
     public Product findPromotionAvailableProduct() {
@@ -52,16 +54,12 @@ public class Orders {
         return products.getPromotionalProductByName(name);
     }
 
-    public Order getPromotionProduct(Product product) {
-        return new Order(product.getName(), 1, true);
+    public void getPromotionProduct(Order order) {
+        order.setQuantity(order.getQuantity() + 1);
     }
 
     public void removeOrder(Order order, int quantity) {
         order.setQuantity(order.getQuantity() - quantity);
-    }
-
-    public void addOrders(List<Order> orders) {
-        this.orders.addAll(orders);
     }
 
     public boolean isPromotionAvailable(Order order) {
@@ -81,9 +79,48 @@ public class Orders {
         return false;
     }
 
-    public int getNotPromotionQuantity(Product product) {
+    public int getNotPromotionQuantity(Order order, Product product) {
         int totalPromotionQuantity = products.getPromotionalProductByName(product.getName()).getQuantity();
-        return totalPromotionQuantity - (totalPromotionQuantity % (product.getPromotion().getGet() + product.getPromotion().getBuy()));
+        return order.getQuantity() - (totalPromotionQuantity - totalPromotionQuantity % (product.getPromotion().getGet() + product.getPromotion().getBuy()));
+    }
+
+    public int getTotalCount() {
+        return orders.stream()
+                .mapToInt(Order::getQuantity)
+                .sum();
+    }
+
+    public Money getTotalPrice() {
+        int total = orders.stream()
+                .mapToInt(order -> {
+                    Product product = products.getProductByName(order.getName());
+                    return product.getPrice().getPrice() * order.getQuantity();
+                }).sum();
+
+        return new Money(total);
+    }
+
+    public Money getPromotionDiscount() {
+        int total = orders.stream()
+                .filter(order -> getAddedProductCount(order) > 0)
+                .filter(order -> isValidDate(products.getPromotionalProductByName(order.getName())))
+                .mapToInt(order -> {
+                    Product product = products.getPromotionalProductByName(order.getName());
+                    return product.getPrice().getPrice() * getAddedProductCount(order);
+                }).sum();
+
+        return new Money(total);
+    }
+
+    public Money getMembership(String membership) {
+        if (membership.equals("N")) return new Money(0);
+        Money totalPrice = getTotalPrice();
+        if ((int) (totalPrice.getPrice() * 0.3) > 8000) return new Money(8000);
+        return new Money((int) (totalPrice.getPrice() * 0.3));
+    }
+
+    public Money getPayment(String membership) {
+        return new Money(getTotalPrice().getPrice() - getPromotionDiscount().getPrice() - getMembership(membership).getPrice());
     }
 
     private boolean checkPromotionCondition(Product product, int quantity) {
@@ -94,4 +131,10 @@ public class Orders {
         int totalPromotionQuantity = products.getPromotionalProductByName(product.getName()).getQuantity();
         return quantity >= totalPromotionQuantity - (totalPromotionQuantity % (product.getPromotion().getGet() + product.getPromotion().getBuy()));
     }
+
+    private boolean isValidDate(Product product) {
+        LocalDate now = DateTimes.now().toLocalDate();
+        return now.isAfter(product.getPromotion().getStartDate()) && now.isBefore(product.getPromotion().getEndDate());
+    }
+
 }
