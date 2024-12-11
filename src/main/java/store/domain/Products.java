@@ -51,7 +51,7 @@ public class Products {
                 .findFirst().orElse(null);
     }
 
-    private Product getPromotionalProductByName(String name) {
+    public Product getPromotionalProductByName(String name) {
         return products.stream()
                 .filter(product -> product.getName().equals(name))
                 .filter(product -> product.getPromotion() != null)
