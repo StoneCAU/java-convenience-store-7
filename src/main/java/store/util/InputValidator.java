@@ -16,7 +16,7 @@ public class InputValidator {
     }
 
     public static String validateReply(String input) {
-        if (!input.equals("Y") && !input.equals("YES")) {
+        if (!input.equals("Y") && !input.equals("N")) {
             throw new StoreException(ErrorMessage.INVALID_OTHERS);
         }
 

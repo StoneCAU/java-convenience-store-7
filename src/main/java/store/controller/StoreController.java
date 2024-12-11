@@ -32,6 +32,11 @@ public class StoreController {
     }
 
     private void getResults(Orders orders) {
+        addOrders(orders);
+        removedOrders(orders);
+    }
+
+    private void addOrders(Orders orders) {
         List<Order> addedOrders = orders.getOrders()
                 .stream()
                 .filter(orders::isPromotionAvailable)
@@ -41,13 +46,32 @@ public class StoreController {
         orders.addOrders(addedOrders);
     }
 
+    private void removedOrders(Orders orders) {
+        orders.getOrders()
+                .stream()
+                .filter(orders::hasNotPromotion)
+                .forEach(order -> checkNotPromotionApplicability(orders, order));
+    }
+
     private Order checkPromotionAvailability(Orders orders) {
         while (true) {
             try {
                 Product product = orders.findPromotionAvailableProduct();
-                String input = InputView.inputPromotionApplicable(product);
-                String reply = InputValidator.validateReply(input);
+                String reply = InputValidator.validateReply(InputView.inputPromotionApplicable(product));
                 if (reply.equals("Y")) return orders.getPromotionProduct(product);
+            } catch (StoreException e) {
+                OutputView.printErrorMessage(e.getMessage());
+            }
+        }
+    }
+
+    private void checkNotPromotionApplicability(Orders orders, Order order) {
+        while (true) {
+            try {
+                Product product = orders.findNotPromotionAvailableProduct();
+                String reply = InputValidator.validateReply(InputView.inputNotPromotionApplicable(product, orders.getNotPromotionQuantity(product)));
+                if (reply.equals("N")) orders.removeOrder(order, orders.getNotPromotionQuantity(product));
+                return;
             } catch (StoreException e) {
                 OutputView.printErrorMessage(e.getMessage());
             }

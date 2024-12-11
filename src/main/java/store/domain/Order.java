@@ -1,8 +1,8 @@
 package store.domain;
 
 public class Order {
-    private String name;
     private int quantity;
+    private String name;
     private boolean isAdded;
 
     public Order(String name, int quantity) {
@@ -15,6 +15,10 @@ public class Order {
         this.name = name;
         this.quantity = quantity;
         this.isAdded = isAdded;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 
     public String getName() {

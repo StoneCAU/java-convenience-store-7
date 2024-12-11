@@ -18,6 +18,12 @@ public class InputView {
         return input();
     }
 
+    public static String inputNotPromotionApplicable(Product product, int quantity) {
+        printNewLine();
+        System.out.printf("현재 %s %d개는 프로모션 할인이 적용되지 않습니다. 그래도 구매하시겠습니까? (Y/N)%n", product.getName(), quantity);
+        return input();
+    }
+
     private static void printNewLine() {
         System.out.printf(NEW_LINE);
     }
