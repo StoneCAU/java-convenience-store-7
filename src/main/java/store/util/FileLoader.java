@@ -23,7 +23,7 @@ public class FileLoader {
         List<Product> productList = getProductsInfo().stream()
                 .skip(1)
                 .map(info -> new Product(parseInfo(info), promotions))
-                .toList();
+                .collect(Collectors.toList());
 
         return new Products(productList);
     }
