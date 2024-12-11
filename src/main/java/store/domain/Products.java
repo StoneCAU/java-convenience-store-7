@@ -15,6 +15,13 @@ public class Products {
         return new ArrayList<>(products);
     }
 
+    public int getTotalQuantityByName(String name) {
+        List<Product> productList = getProductsByName(name);
+        return productList.stream()
+                .mapToInt(Product::getQuantity)
+                .sum();
+    }
+
     private void addNormalOutOfStockProduct() {
         while (isNeedToAdd()) {
             Product product = findNormalOutOfStockProduct();
