@@ -13,6 +13,6 @@ public class Money {
 
     @Override
     public String toString() {
-        return String.format("%,d원", price);
+        return String.format("%,d", price);
     }
 }

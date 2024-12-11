@@ -34,6 +34,8 @@ public class StoreController {
     private void getResults(Orders orders) {
         addOrders(orders);
         removedOrders(orders);
+        String membership = checkMembership();
+        OutputView.printResults(orders);
     }
 
     private void addOrders(Orders orders) {
@@ -72,6 +74,17 @@ public class StoreController {
                 String reply = InputValidator.validateReply(InputView.inputNotPromotionApplicable(product, orders.getNotPromotionQuantity(product)));
                 if (reply.equals("N")) orders.removeOrder(order, orders.getNotPromotionQuantity(product));
                 return;
+            } catch (StoreException e) {
+                OutputView.printErrorMessage(e.getMessage());
+            }
+        }
+    }
+
+    private String checkMembership() {
+        while (true) {
+            try {
+                String input = InputView.inputMembership();
+                return InputValidator.validateReply(input);
             } catch (StoreException e) {
                 OutputView.printErrorMessage(e.getMessage());
             }

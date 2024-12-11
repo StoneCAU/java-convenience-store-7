@@ -15,6 +15,21 @@ public class Orders {
         return orders;
     }
 
+    public Product findByName(String name) {
+        return products.getProducts()
+                .stream()
+                .filter(product -> product.getName().equals(name))
+                .findFirst().get();
+    }
+
+    public int getAddedProductCount(Order order) {
+        Product product = products.getPromotionalProductByName(order.getName());
+        if (product != null)
+            return order.getQuantity() / (product.getPromotion().getBuy() + product.getPromotion().getGet());
+
+        return 0;
+    }
+
     public Product findPromotionAvailableProduct() {
          String name = orders.stream()
                 .filter(order -> products.getPromotionalProductByName(order.getName()) != null)

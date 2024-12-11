@@ -51,8 +51,8 @@ public class Product {
     @Override
     public String toString() {
         if (promotion != null)
-            return "- " + name + " " + price + " " + getQuantityString() + " " + promotion.getName();
-        return "- " + name + " " + price + " " + getQuantityString();
+            return "- " + name + " " + price + "원 " + getQuantityString() + " " + promotion.getName();
+        return "- " + name + " " + price + "원 " + getQuantityString();
     }
 
     private String getQuantityString() {
